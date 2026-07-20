@@ -17,3 +17,4 @@ function(add_blockchain_test name)
 endfunction()
 
 add_blockchain_test(test_transaction)
+add_blockchain_test(test_merkle)
