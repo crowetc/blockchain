@@ -7,7 +7,7 @@ add_library(blockchain
 )
 
 target_include_directories (blockchain
-    PUBLIC ${CMAKE_SOURCE_DIR}
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_executable(main "main.cpp")
