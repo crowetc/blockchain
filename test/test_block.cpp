@@ -59,7 +59,7 @@ TEST(block_test, mining_produces_valid_hash)
     bc::Block b(txs, "0000", 4);
     b.mine();
 
-    std::string h = b.hash();
+    const auto h = b.hash();
     EXPECT_EQ(h.substr(0, b.header.difficulty),
               std::string(b.header.difficulty, '0'));
 }

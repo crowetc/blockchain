@@ -24,7 +24,7 @@ public:
     /** Construct a Merkle_tree
      *  @param txs the set of transactiosn to store in the tree
      */
-    Merkle_tree(const std::vector<Transaction>& txs);
+    explicit Merkle_tree(const std::vector<Transaction>& txs);
 
     /** The Merkle root for this tree. */
     const std::string&
