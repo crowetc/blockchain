@@ -4,6 +4,7 @@ add_library(blockchain
     Merkle_proof.cpp
     Merkle_tree.cpp
     sha256.cpp
+    Transaction.cpp
 )
 
 target_include_directories (blockchain

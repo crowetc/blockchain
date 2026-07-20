@@ -10,7 +10,7 @@
 TEST(merkle_test, single_transaction)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
     
     bc::Merkle_tree tree(txs);
 
@@ -24,8 +24,8 @@ TEST(merkle_test, single_transaction)
 TEST(merkle_test, two_transactions)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
-    txs.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
+    txs.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
     
     bc::Merkle_tree tree(txs);
 
@@ -40,9 +40,9 @@ TEST(merkle_test, two_transactions)
 TEST(merkle_test, three_transactions)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
-    txs.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
-    txs.emplace_back(bc::Transaction{"eve","frank",30,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
+    txs.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
+    txs.emplace_back(bc::Transaction("eve","frank",30,std::time(nullptr)));
 
     bc::Merkle_tree tree(txs);
 
@@ -57,9 +57,9 @@ TEST(merkle_test, three_transactions)
 TEST(merkle_test, deterministic_root)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
-    txs.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
-    txs.emplace_back(bc::Transaction{"eve","frank",30,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
+    txs.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
+    txs.emplace_back(bc::Transaction("eve","frank",30,std::time(nullptr)));
 
     bc::Merkle_tree t1(txs);
     bc::Merkle_tree t2(txs);
@@ -71,14 +71,14 @@ TEST(merkle_test, deterministic_root)
 TEST(merkle_test, root_changes_with_transaction)
 {
     std::vector<bc::Transaction> txs1;
-    txs1.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
-    txs1.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
-    txs1.emplace_back(bc::Transaction{"eve","frank",30,std::time(nullptr)});
+    txs1.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
+    txs1.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
+    txs1.emplace_back(bc::Transaction("eve","frank",30,std::time(nullptr)));
 
     std::vector<bc::Transaction> txs2;
-    txs2.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
-    txs2.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
-    txs2.emplace_back(bc::Transaction{"eve","frank",31,std::time(nullptr)}); // different amount
+    txs2.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
+    txs2.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
+    txs2.emplace_back(bc::Transaction("eve","frank",31,std::time(nullptr))); // different amount
 
     bc::Merkle_tree t1(txs1);
     bc::Merkle_tree t2(txs2);

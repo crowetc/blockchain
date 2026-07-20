@@ -10,7 +10,7 @@
 TEST(chain_test, GenesisBlockCreated)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
 
     bc::Chain chain(txs, 3);
 
@@ -25,13 +25,13 @@ TEST(chain_test, GenesisBlockCreated)
 TEST(chain_test, add_block_increases_size)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
 
     bc::Chain chain(txs, 3);
     EXPECT_EQ(chain.size(), 1u);
 
     std::vector<bc::Transaction> txs2;
-    txs2.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
+    txs2.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
 
     chain.add_block(txs2);
     EXPECT_EQ(chain.size(), 2u);
@@ -41,13 +41,13 @@ TEST(chain_test, add_block_increases_size)
 TEST(chain_test, valid_chain_passes_validation)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
 
     bc::Chain chain(txs, 3);
     EXPECT_EQ(chain.size(), 1u);
 
     std::vector<bc::Transaction> txs2;
-    txs2.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
+    txs2.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
 
     chain.add_block(txs2);
 
@@ -58,13 +58,13 @@ TEST(chain_test, valid_chain_passes_validation)
 TEST(chain_test, tampered_hash_fails_validation)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
 
     bc::Chain chain(txs, 3);
     EXPECT_EQ(chain.size(), 1u);
 
     std::vector<bc::Transaction> txs2;
-    txs2.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
+    txs2.emplace_back(bc::Transaction("carol","dave",20,std::time(nullptr)));
 
     chain.add_block(txs2);
     EXPECT_TRUE(chain.validate());
@@ -81,7 +81,7 @@ TEST(chain_test, tampered_hash_fails_validation)
 TEST(ChainTest, block_out_of_range_throws)
 {
     std::vector<bc::Transaction> txs;
-    txs.emplace_back(bc::Transaction{"alice","bob",10,std::time(nullptr)});
+    txs.emplace_back(bc::Transaction("alice","bob",10,std::time(nullptr)));
 
     bc::Chain chain(txs, 3);
 

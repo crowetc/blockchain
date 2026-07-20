@@ -1,8 +1,10 @@
 #ifndef TRANSACTION_HPP_
 #define TRANSACTION_HPP_
 
+#include <ctime>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 namespace bc
 {
@@ -11,37 +13,78 @@ namespace bc
  * 
  *  A simple structure that represents the transfer of value between two parties.
  */
-struct Transaction
+class Transaction
 {
-    std::string from; // sender
-    std::string to;   // recipient
-    uint64_t amount;  // transferred value
-    time_t time;      // time of transaction
+public:
+    Transaction(const std::string& sender,
+                const std::string& receiver,
+                uint64_t amount,
+                std::time_t timestamp = std::time(nullptr));
+
+    /** Accesors. */
+    const std::string&
+    sender() const;
+
+    const std::string&
+    receiver() const;
+
+    uint64_t
+    amount() const;
+
+    std::time_t
+    timestamp() const;
 
     /** Serialize the transaction into a string. */
     std::string
-    serialize() const
-    {
-        std::stringstream ss;
-        ss << "from:" << from
-           << "|to:" << to
-           << "|amount:" << amount
-           << "|time:" << time;
-        return ss.str();
-    }
+    serialize() const;
 
     /** Validate the transaction. */
     bool
-    validate() const
-    {
-        // Check structure
-        if (from.empty() || to.empty()) { return false; }
-        if (amount <= 0) { return false; }
+    validate() const;
 
-        return true;
-    }
-
+private:
+    // Core fields
+    std::string sender_;
+    std::string receiver_;
+    uint64_t amount_;
+    std::time_t timestamp_;
 };
+
+//
+// Inline Implementations
+//
+
+inline
+const std::string&
+Transaction::
+sender() const
+{
+    return sender_;
+}
+
+inline
+const std::string&
+Transaction::
+receiver() const
+{
+    return receiver_;
+}
+
+inline
+uint64_t
+Transaction::
+amount() const
+{
+    return amount_;
+}
+
+inline
+std::time_t
+Transaction::
+timestamp() const
+{
+    return timestamp_;
+}
 
 } // namespace bc
 

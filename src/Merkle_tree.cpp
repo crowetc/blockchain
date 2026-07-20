@@ -51,4 +51,4 @@ build(const std::vector<Transaction>& txs)
     root_ = current[0];
 }
 
-}
+} // namespace bc

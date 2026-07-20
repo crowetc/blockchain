@@ -56,4 +56,4 @@ verify(const Merkle_proof& proof, const std::string& root)
     return hash_val == root;
 }
 
-}
+} // namespace bc
