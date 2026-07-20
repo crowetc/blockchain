@@ -44,7 +44,7 @@ TEST(merkle_test, three_transactions)
     txs.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
     txs.emplace_back(bc::Transaction{"eve","frank",30,std::time(nullptr)});
 
-    bc::Merkle_tree tree{txs};
+    bc::Merkle_tree tree(txs);
 
     const auto& levels = tree.levels();
     ASSERT_FALSE(levels.empty());
@@ -61,8 +61,8 @@ TEST(merkle_test, deterministic_root)
     txs.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
     txs.emplace_back(bc::Transaction{"eve","frank",30,std::time(nullptr)});
 
-    bc::Merkle_tree t1{txs};
-    bc::Merkle_tree t2{txs};
+    bc::Merkle_tree t1(txs);
+    bc::Merkle_tree t2(txs);
 
     EXPECT_EQ(t1.root(), t2.root());
 }
@@ -80,8 +80,8 @@ TEST(merkle_test, root_changes_with_transaction)
     txs2.emplace_back(bc::Transaction{"carol","dave",20,std::time(nullptr)});
     txs2.emplace_back(bc::Transaction{"eve","frank",31,std::time(nullptr)}); // different amount
 
-    bc::Merkle_tree t1{txs1};
-    bc::Merkle_tree t2{txs2};
+    bc::Merkle_tree t1(txs1);
+    bc::Merkle_tree t2(txs2);
 
     EXPECT_NE(t1.root(), t2.root());
 }

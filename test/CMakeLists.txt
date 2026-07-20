@@ -18,3 +18,4 @@ endfunction()
 
 add_blockchain_test(test_transaction)
 add_blockchain_test(test_merkle)
+add_blockchain_test(test_block)
