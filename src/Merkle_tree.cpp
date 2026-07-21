@@ -1,4 +1,4 @@
-#include "sha256.h"
+#include "crypto_utils.hpp"
 #include "Merkle_tree.hpp"
 
 namespace bc
@@ -20,7 +20,7 @@ build(const std::vector<Transaction>& txs)
     // Hash each transaction into a leaf
     for (const auto& tx : txs)
     {
-        current.push_back(sha256(tx.serialize()));
+        current.push_back(sha256_hex(tx.serialize()));
     }
 
     levels_.push_back(current);
@@ -35,12 +35,12 @@ build(const std::vector<Transaction>& txs)
         {
             if (i + 1 < current.size())
             {
-                next.push_back(sha256(current[i] + current[i + 1]));
+                next.push_back(sha256_hex(current[i] + current[i + 1]));
             }
             else
             {
                 // duplicate last node if odd count
-                next.push_back(sha256(current[i] + current[i]));
+                next.push_back(sha256_hex(current[i] + current[i]));
             }
         }
 

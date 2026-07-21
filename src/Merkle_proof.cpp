@@ -1,4 +1,4 @@
-#include "sha256.h"
+#include "crypto_utils.hpp"
 #include "Merkle_proof.hpp"
 #include "Merkle_tree.hpp"
 
@@ -45,11 +45,11 @@ verify(const Merkle_proof& proof, const std::string& root)
     {
         if (proof.is_right_sibling[i])
         {
-            hash_val = sha256(hash_val + proof.siblings[i]);
+            hash_val = sha256_hex(hash_val + proof.siblings[i]);
         }
         else
         {
-            hash_val = sha256(proof.siblings[i] + hash_val);
+            hash_val = sha256_hex(proof.siblings[i] + hash_val);
         }
     }
 

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "Merkle_tree.hpp"
 #include "Transaction.hpp"
-#include "sha256.h"
 
 #include <string>
 #include <vector>

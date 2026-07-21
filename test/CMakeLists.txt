@@ -7,8 +7,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
-enable_testing()
-
 # Helper function to add tests
 function(add_blockchain_test name)
     add_executable(${name} ${name}.cpp)

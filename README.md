@@ -20,10 +20,3 @@ cmake ..
 make
 ctest
 ```
-
-## Credits
-
-This project uses a SHA‑256 implementation originally based on Olivier Gay’s
-FIPS 180‑2 reference code, updated to C++ by zedwood.com (2012).  
-The implementation is released under the Modified BSD License.  
-See `sha256.h` for full license details.

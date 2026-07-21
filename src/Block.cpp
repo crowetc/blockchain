@@ -1,6 +1,6 @@
 #include "Block.hpp"
+#include "crypto_utils.hpp"
 #include "Merkle_tree.hpp"
-#include "sha256.h"
 
 #include <sstream>
 
@@ -39,7 +39,7 @@ compute_hash() const
        << header.nonce
        << header.difficulty;
 
-    return sha256(ss.str());
+    return sha256_hex(ss.str());
 }
 
 void
@@ -86,7 +86,7 @@ compute_merkle_root() const
 {
     if (body.transactions.empty())
     {
-        return sha256("");
+        return sha256_hex("");
     }
 
     Merkle_tree tree(body.transactions);

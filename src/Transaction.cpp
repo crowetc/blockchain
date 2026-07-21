@@ -1,4 +1,3 @@
-#include "sha256.h"
 #include "Transaction.hpp"
 
 namespace bc
