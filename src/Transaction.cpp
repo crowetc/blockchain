@@ -39,6 +39,13 @@ serialize() const
     return ss.str();
 }
 
+std::string
+Transaction::
+hash() const
+{
+    return sha256_hex(serialize());
+}
+
 void
 Transaction::
 sign(const std::array<unsigned char, 64>& sk)

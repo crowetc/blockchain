@@ -20,7 +20,7 @@ build(const std::vector<Transaction>& txs)
     // Hash each transaction into a leaf
     for (const auto& tx : txs)
     {
-        current.push_back(sha256_hex(tx.serialize()));
+        current.push_back(tx.hash());
     }
 
     levels_.push_back(current);

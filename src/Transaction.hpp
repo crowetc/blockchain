@@ -51,6 +51,10 @@ public:
     std::string
     serialize() const;
 
+    /** Compute the SHA-256 hash of the serialized transaction. */
+    std::string
+    hash() const;
+
     /** Sign the transaction using the provided Ed25519 secret key. */
     void
     sign(const std::array<unsigned char, 64>& sk);
