@@ -4,7 +4,6 @@ add_library(blockchain
     crypto_utils.cpp
     Merkle_proof.cpp
     Merkle_tree.cpp
-    sha256.cpp
     Transaction.cpp
 )
 

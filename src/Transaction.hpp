@@ -1,10 +1,10 @@
 #ifndef TRANSACTION_HPP_
 #define TRANSACTION_HPP_
 
+#include <array>
 #include <ctime>
 #include <string>
-#include <sstream>
-#include <stdexcept>
+#include <vector>
 
 namespace bc
 {
@@ -21,7 +21,10 @@ public:
                 uint64_t amount,
                 std::time_t timestamp = std::time(nullptr));
 
-    /** Accesors. */
+    //
+    // Accesors
+    //
+
     const std::string&
     sender() const;
 
@@ -34,9 +37,23 @@ public:
     std::time_t
     timestamp() const;
 
+    const std::array<unsigned char, 32>&
+    public_key() const;
+
+    const std::vector<unsigned char>&
+    signature() const;
+
+    //
+    // Signing and Validation
+    //
+
     /** Serialize the transaction into a string. */
     std::string
     serialize() const;
+
+    /** Sign the transaction using the provided Ed25519 secret key. */
+    void
+    sign(const std::array<unsigned char, 64>& sk);
 
     /** Validate the transaction. */
     bool
@@ -48,6 +65,10 @@ private:
     std::string receiver_;
     uint64_t amount_;
     std::time_t timestamp_;
+
+    // Cryptographic fields
+    std::array<unsigned char, 32> public_key_{};
+    std::vector<unsigned char> signature_; 
 };
 
 //
@@ -84,6 +105,22 @@ Transaction::
 timestamp() const
 {
     return timestamp_;
+}
+
+inline
+const std::array<unsigned char, 32>&
+Transaction::
+public_key() const
+{
+    return public_key_;
+}
+
+inline
+const std::vector<unsigned char>&
+Transaction::
+signature() const
+{
+    return signature_;
 }
 
 } // namespace bc

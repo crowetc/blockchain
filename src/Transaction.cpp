@@ -1,4 +1,7 @@
+#include "crypto_utils.hpp"
 #include "Transaction.hpp"
+
+#include <sstream>
 
 namespace bc
 {
@@ -29,11 +32,21 @@ Transaction::
 serialize() const
 {
     std::stringstream ss;
-    ss << "sender: " << sender_
-       << " | receiver: " << receiver_
-       << " | amount: " << amount_
-       << " | time: " << timestamp_;
+    ss << sender_ << '|'
+       << receiver_ << '|'
+       << amount_ << '|'
+       << timestamp_;
     return ss.str();
+}
+
+void
+Transaction::
+sign(const std::array<unsigned char, 64>& sk)
+{
+    // Extract public key from secret key (libsodium stores pk inside sk)
+    std::copy(sk.begin() + 32, sk.end(), public_key_.begin());
+
+    signature_ = bc::sign(serialize(), sk);
 }
 
 bool
@@ -44,7 +57,9 @@ validate() const
     if (sender_.empty() || receiver_.empty()) { return false; }
     if (amount_ <= 0) { return false; }
 
-    return true;
+    // Check signature
+    if (signature_.empty()) { return false; }
+    return verify(serialize(), signature_, public_key_);
 }
 
 } // namespace bc
