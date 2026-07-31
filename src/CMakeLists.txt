@@ -1,5 +1,6 @@
 add_subdirectory(crypto)
 add_subdirectory(ledger)
+add_subdirectory(network)
 
 add_executable(example example.cpp)
 

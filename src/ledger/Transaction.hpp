@@ -47,10 +47,6 @@ public:
     // Signing and Validation
     //
 
-    /** Serialize the transaction into a string. */
-    std::string
-    serialize() const;
-
     /** Compute the SHA-256 hash of the serialized transaction. */
     std::string
     hash() const;
@@ -62,6 +58,14 @@ public:
     /** Validate the transaction. */
     bool
     validate() const;
+
+    /** Serialize the transaction into a string. */
+    std::string
+    serialize() const;
+
+    /** Deserialize the transaction from a string. */
+    static Transaction
+    deserialize(const std::string& raw);
 
 private:
     // Core fields

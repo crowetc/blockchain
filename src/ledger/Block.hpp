@@ -76,6 +76,14 @@ public:
     bool
     validate() const;
 
+    /** Serialize the block into a string. */
+    std::string
+    serialize() const;
+
+    /** Deserialize the block from a string. */
+    static Block
+    deserialize(const std::string& raw);
+
 private:
     std::string hash_;
 

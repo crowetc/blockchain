@@ -82,6 +82,76 @@ validate() const
 
 std::string
 Block::
+serialize() const
+{
+    std::stringstream ss;
+
+    // Serialize header fields
+    ss << header.prev_hash << '|'
+       << header.merkle_root << '|'
+       << header.time << '|'
+       << header.nonce << '|'
+       << header.difficulty << '|';
+
+    // Serialize transactions (semicolon-separated)
+    for (std::size_t i = 0; i < body.transactions.size(); ++i)
+    {
+        ss << body.transactions[i].serialize();
+        if (i + 1 < body.transactions.size())
+            ss << ';';
+    }
+
+    return ss.str();
+}
+
+Block
+Block::
+deserialize(const std::string& raw)
+{
+    // Split header from transaction list
+    auto header_end = raw.find_last_of('|');
+    std::string header_part = raw.substr(0, header_end);
+    std::string tx_part = raw.substr(header_end + 1);
+
+    // Parse header fields
+    std::vector<std::string> fields;
+    std::size_t pos = 0, next;
+    while ((next = header_part.find('|', pos)) != std::string::npos)
+    {
+        fields.push_back(header_part.substr(pos, next - pos));
+        pos = next + 1;
+    }
+
+    Block_header hdr;
+    hdr.prev_hash = fields[0];
+    hdr.merkle_root = fields[1];
+    hdr.time = std::stoll(fields[2]);
+    hdr.nonce = std::stoull(fields[3]);
+    hdr.difficulty = std::stoul(fields[4]);
+
+    // Parse transactions
+    std::vector<Transaction> txs;
+    pos = 0;
+    while ((next = tx_part.find(';', pos)) != std::string::npos)
+    {
+        txs.push_back(Transaction::deserialize(tx_part.substr(pos, next - pos)));
+        pos = next + 1;
+    }
+
+    if (pos < tx_part.size())
+        txs.push_back(Transaction::deserialize(tx_part.substr(pos)));
+
+    // Reconstruct block
+    Block b(txs, hdr.prev_hash, hdr.difficulty);
+    b.header = hdr;
+    b.hash_ = b.compute_hash();
+
+    return b;
+}
+
+
+std::string
+Block::
 compute_merkle_root() const
 {
     if (body.transactions.empty())

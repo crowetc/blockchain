@@ -29,18 +29,6 @@ Transaction(const std::string& sender,
 
 std::string
 Transaction::
-serialize() const
-{
-    std::stringstream ss;
-    ss << sender_ << '|'
-       << receiver_ << '|'
-       << amount_ << '|'
-       << timestamp_;
-    return ss.str();
-}
-
-std::string
-Transaction::
 hash() const
 {
     return sha256_hex(serialize());
@@ -68,5 +56,52 @@ validate() const
     if (signature_.empty()) { return false; }
     return verify(serialize(), signature_, public_key_);
 }
+
+std::string
+Transaction::
+serialize() const
+{
+    std::stringstream ss;
+    ss << sender_ << '|'
+       << receiver_ << '|'
+       << amount_ << '|'
+       << timestamp_;
+    return ss.str();
+}
+
+Transaction
+Transaction::
+deserialize(const std::string& raw)
+{
+    // Expected format:
+    // sender|receiver|amount|timestamp
+
+    std::size_t pos = 0;
+    std::size_t next;
+
+    // Parse sender
+    next = raw.find('|', pos);
+    std::string sender = raw.substr(pos, next - pos);
+    pos = next + 1;
+
+    // Parse receiver
+    next = raw.find('|', pos);
+    std::string receiver = raw.substr(pos, next - pos);
+    pos = next + 1;
+
+    // Parse amount
+    next = raw.find('|', pos);
+    uint64_t amount = std::stoull(raw.substr(pos, next - pos));
+    pos = next + 1;
+
+    // Parse timestamp
+    std::time_t timestamp = std::stoll(raw.substr(pos));
+
+    // Reconstruct the transaction
+    Transaction tx(sender, receiver, amount, timestamp);
+
+    return tx;
+}
+
 
 } // namespace bc
