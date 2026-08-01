@@ -1,5 +1,6 @@
 add_library(network
     Node.cpp
+    Tcp_peer.cpp
 )
 
 target_include_directories (network
