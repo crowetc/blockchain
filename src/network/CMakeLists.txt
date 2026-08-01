@@ -1,4 +1,5 @@
 add_library(network
+    Message.cpp
     Node.cpp
     Tcp_peer.cpp
 )
@@ -9,5 +10,5 @@ target_include_directories (network
 
 target_link_libraries(network
     PUBLIC crypto
-    Public ledger
+    PUBLIC ledger
 )
