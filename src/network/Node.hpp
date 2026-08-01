@@ -8,13 +8,15 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Peer.hpp"
-#include "Message.hpp"
 #include "Chain.hpp"
 #include "Transaction.hpp"
 
 namespace bc
 {
+
+// Forward Declarations
+class Message;
+class Peer;
 
 /** Node
  *
@@ -55,14 +57,12 @@ public:
     void
     stop();
 
-    /** Connect to a remote peer.
-     *  @param host Remote hostname or IP address.
-     *  @param port Remote port.
+    /** Add a peer to the node.
      *
-     *  If the connection succeeds, the peer is added to the peer map.
+     *  Transfers ownership of a connected Peer into the node’s peer map.
      */
     void
-    connect(const std::string& host, uint16_t port);
+    add_peer(std::unique_ptr<Peer> peer);
 
     /** Broadcast a message to all connected peers. */
     void

@@ -1,5 +1,6 @@
 #include "Node.hpp"
-#include "Tcp_peer.hpp"
+#include "Message.hpp"
+#include "Peer.hpp"
 
 #include <iostream>
 
@@ -25,15 +26,10 @@ stop()
 
 void
 Node::
-connect(const std::string& host, uint16_t port)
+add_peer(std::unique_ptr<Peer> peer)
 {
-    auto peer = std::make_unique<Tcp_peer>(host, port);
-    if (peer->connect())
-    {
-        std::lock_guard<std::mutex> lock(peer_mutex_);
-        peers_.emplace(peer->id(), std::move(peer));
-        std::cout << "Connected to peer: " << host << ":" << port << "\n";
-    }
+    std::lock_guard<std::mutex> lock(peer_mutex_);
+    peers_.emplace(peer->id(), std::move(peer));
 }
 
 void
