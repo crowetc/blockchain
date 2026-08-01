@@ -1,41 +1,33 @@
 #ifndef PEER_HPP_
 #define PEER_HPP_
 
+#include <string>
+#include <cstdint>
+
 namespace bc
 {
 
 /** Peer
  *
- *  Represents a remote node in the blockchain network.
+ *  Protocol-agnostic communication interface used by Node.
  *
  *  Responsibilities:
- *    - Establish and maintain a TCP connection to a remote host.
- *    - Send and receive raw string data over the socket.
- *    - Provide a unique identifier for use in peer maps.
- *
- *  This class abstracts low-level socket operations so that higher-level
- *  components (e.g., Node) can treat peers as simple communication endpoints.
+ *  - Establish and maintain a connection to a remote host.
+ *  - Send and receive raw string data over the connection.
+ *  - Provide a unique identifier for use in peer maps.
  */
 class Peer
 {
 public:
-    /** Construct a Peer
-     *  @param host Remote hostname or IP address.
-     *  @param port Remote port number.
-     *
-     *  The peer is not connected upon construction; connect() must be called
-     *  explicitly.
-     */
-    Peer(const std::string& host, uint16_t port);
+    virtual ~Peer() = default;
 
-    /** Establish a TCP connection to the remote peer.
-     *
+    /** Establish a connection to the remote peer.
      *  @return true if the connection succeeds, false otherwise.
      */
     bool
     connect();
 
-    /** Close the TCP connection if one is active. */
+    /** Close the connection if one is active. */
     void
     disconnect();
 
@@ -56,20 +48,29 @@ public:
     bool
     connected() const;
 
-    /** Unique identifier for this peer.
-     *
-     *  Format: "<host>:<port>"
-     *
-     *  Used by Node to index peers in an unordered_map.
-     */
+    /** Unique identifier for this peer (e.g., "host:port"). */
     std::string
     id() const;
 
 private:
-    std::string host_;
-    uint16_t port_;
-    int socket_fd_;
-    bool connected_;
+
+    virtual bool
+    connect_impl() = 0;
+
+    virtual void
+    disconnect_impl() = 0;
+
+    virtual bool
+    send_impl(const std::string& data) = 0;
+
+    virtual std::string
+    receive_impl() = 0;
+
+    virtual bool
+    connected_impl() const = 0;
+
+    virtual std::string
+    id_impl() const = 0;
 };
 
 //
@@ -79,9 +80,41 @@ private:
 inline
 bool
 Peer::
+connect()
+{
+    return connect_impl();
+}
+
+inline
+void
+Peer::
+disconnect()
+{
+    disconnect_impl();
+}
+
+inline
+bool
+Peer::
+send(const std::string& data)
+{
+    return send_impl(data);
+}
+
+inline
+std::string
+Peer::
+receive()
+{
+    return receive_impl();
+}
+
+inline
+bool
+Peer::
 connected() const
 {
-    return connected_;
+    return connected_impl();
 }
 
 inline
@@ -89,7 +122,7 @@ std::string
 Peer::
 id() const
 {
-    return host_ + ':' + std::to_string(port_);
+    return id_impl();
 }
 
 } // namespace bc

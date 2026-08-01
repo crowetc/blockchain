@@ -1,4 +1,4 @@
-#include "Peer.hpp"
+#include "Tcp_peer.hpp"
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -8,14 +8,14 @@
 namespace bc
 {
 
-Peer::
-Peer(const std::string& host, uint16_t port)
+Tcp_peer::
+Tcp_peer(const std::string& host, uint16_t port)
 : host_(host), port_(port), socket_fd_(-1), connected_(false)
 {}
 
 bool
-Peer::
-connect()
+Tcp_peer::
+connect_impl()
 {
     socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_fd_ < 0)
@@ -36,8 +36,8 @@ connect()
 }
 
 void
-Peer::
-disconnect()
+Tcp_peer::
+disconnect_impl()
 {
     if (connected_)
     {
@@ -47,8 +47,8 @@ disconnect()
 }
 
 bool
-Peer::
-send(const std::string& data)
+Tcp_peer::
+send_impl(const std::string& data)
 {
     if (!connected_)
         return false;
@@ -58,8 +58,8 @@ send(const std::string& data)
 }
 
 std::string
-Peer::
-receive()
+Tcp_peer::
+receive_impl()
 {
     if (!connected_)
         return {};

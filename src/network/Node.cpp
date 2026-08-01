@@ -1,4 +1,6 @@
 #include "Node.hpp"
+#include "Tcp_peer.hpp"
+
 #include <iostream>
 
 namespace bc
@@ -25,11 +27,11 @@ void
 Node::
 connect(const std::string& host, uint16_t port)
 {
-    Peer peer(host, port);
-    if (peer.connect())
+    auto peer = std::make_unique<Tcp_peer>(host, port);
+    if (peer->connect())
     {
         std::lock_guard<std::mutex> lock(peer_mutex_);
-        peers_.emplace(peer.id(), std::move(peer));
+        peers_.emplace(peer->id(), std::move(peer));
         std::cout << "Connected to peer: " << host << ":" << port << "\n";
     }
 }
@@ -40,7 +42,7 @@ broadcast(const Message& msg)
 {
     std::lock_guard<std::mutex> lock(peer_mutex_);
     for (auto& [id, peer] : peers_)
-        peer.send(msg.encode());
+        peer->send(msg.encode());
 }
 
 void
@@ -75,10 +77,10 @@ listen()
 
         for (auto& [id, peer] : peers_)
         {
-            if (!peer.connected())
+            if (!peer->connected())
                 continue;
 
-            std::string raw = peer.receive();
+            std::string raw = peer->receive();
             if (raw.empty())
                 continue;
 

@@ -79,7 +79,7 @@ public:
 private:
     // Networking
     uint16_t port_;
-    std::unordered_map<std::string, Peer> peers_;
+    std::unordered_map<std::string, std::unique_ptr<Peer>> peers_;
     std::mutex peer_mutex_;
     std::thread listener_;
 
