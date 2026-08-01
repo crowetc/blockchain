@@ -60,6 +60,9 @@ public:
      *
      *  Inverse of encode(). Splits the raw string at the first delimiter
      *  and reconstructs the Message_type and payload.
+     *
+     *  Malformed Messages are decoded with Message_type::NEW_TRANSACTION
+     *  and an empty payload.
      */
     static Message
     decode(const std::string& raw);

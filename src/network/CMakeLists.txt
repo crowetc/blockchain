@@ -12,3 +12,5 @@ target_link_libraries(network
     PUBLIC crypto
     PUBLIC ledger
 )
+
+add_subdirectory(test)
