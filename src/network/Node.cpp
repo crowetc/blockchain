@@ -1,6 +1,9 @@
-#include "Node.hpp"
+#include "Block.hpp"
+#include "Chain.hpp"
 #include "Message.hpp"
+#include "Node.hpp"
 #include "Peer.hpp"
+#include "Transaction.hpp"
 
 #include <iostream>
 

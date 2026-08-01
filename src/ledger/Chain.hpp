@@ -1,14 +1,15 @@
 #ifndef BLOCKCHAIN_HPP_
 #define BLOCKCHAIN_HPP_
 
-#include "Block.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <vector>
 
 namespace bc
 {
+
+// Forward Declarations
+class Block;
 
 /** Simple Blockchain
  * 

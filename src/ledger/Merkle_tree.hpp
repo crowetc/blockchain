@@ -4,10 +4,11 @@
 #include <string>
 #include <vector>
 
-#include "Transaction.hpp"
-
 namespace bc
 {
+
+// Forward Declarations
+class Transaction;
 
 /** Merkle tree
  *

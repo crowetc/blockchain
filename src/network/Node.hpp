@@ -8,15 +8,14 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Chain.hpp"
-#include "Transaction.hpp"
-
 namespace bc
 {
 
 // Forward Declarations
+class Chain;
 class Message;
 class Peer;
+class Transaction;
 
 /** Node
  *

@@ -1,5 +1,6 @@
 #include "crypto_utils.hpp"
 #include "Merkle_tree.hpp"
+#include "Transaction.hpp"
 
 namespace bc
 {
