@@ -1,9 +1,7 @@
 #include "Block.hpp"
-#include "Chain.hpp"
 #include "Message.hpp"
 #include "Node.hpp"
 #include "Peer.hpp"
-#include "Transaction.hpp"
 
 #include <iostream>
 
@@ -93,6 +91,9 @@ void
 Node::
 handle_message(const Message& msg)
 {
+    if (msg.payload.empty())
+        return;
+
     if (msg.type == Message_type::NEW_TRANSACTION)
     {
         Transaction tx = Transaction::deserialize(msg.payload);

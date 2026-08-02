@@ -5,11 +5,11 @@
 #include <memory>
 #include <vector>
 
+#include "Block.hpp"
+#include "Transaction.hpp"
+
 namespace bc
 {
-
-// Forward Declarations
-class Block;
 
 /** Simple Blockchain
  * 

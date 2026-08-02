@@ -1,4 +1,3 @@
-#include "Block.hpp"
 #include "Chain.hpp"
 
 #include <algorithm>

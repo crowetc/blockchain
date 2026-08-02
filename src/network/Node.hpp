@@ -8,14 +8,15 @@
 #include <vector>
 #include <unordered_map>
 
+#include "Chain.hpp"
+#include "Transaction.hpp"
+
 namespace bc
 {
 
 // Forward Declarations
-class Chain;
 class Message;
 class Peer;
-class Transaction;
 
 /** Node
  *
@@ -29,7 +30,7 @@ class Transaction;
  *  - Listen for incoming messages
  *
  *  Concurrency Model:
- *  - The Noe runs a dedicated listener thread that polls all connected peers
+ *  - The Node runs a dedicated listener thread that polls all connected peers
  *  - The main thread may submit transactions, mine blocks, or initiate peer connections
  *  - Access to the peer map is synchronized with a mutex
  */
@@ -110,6 +111,7 @@ private:
 // Inline Implementations
 //
 
+inline
 Node::
 Node(uint16_t port, uint32_t difficulty)
 : port_(port),

@@ -11,3 +11,4 @@ function(add_blockchain_test name)
 endfunction()
 
 add_blockchain_test(test_message)
+add_blockchain_test(test_node)
