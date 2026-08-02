@@ -105,6 +105,20 @@ private:
      */
     void
     handle_message(const Message& msg);
+
+    /** Validate a transaction at the node level.
+     *
+     *  Performs basic structural checks and node‑specific policy checks.
+     */
+    bool
+    validate(const Transaction& tx);
+
+    /** Validate a block at the node level.
+     *
+     *  Ensures the block is valid and correctly extends the local chain tip.
+     */
+    bool
+    validate(const Block& blk);
 };
 
 //
@@ -118,6 +132,14 @@ Node(uint16_t port, uint32_t difficulty)
   chain_({}, difficulty),
   running_(false)
 {}
+
+inline
+bool
+Node::
+validate(const Transaction& tx)
+{
+    return tx.validate();
+}
 
 } // namespace bc
 

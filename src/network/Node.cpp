@@ -106,4 +106,19 @@ handle_message(const Message& msg)
     }
 }
 
+bool
+Node::
+validate(const Block& blk)
+{
+    if (!blk.validate())
+        return false;
+
+    // Check chain continuity
+    const Block& tip = chain_.get_block(chain_.size() - 1);
+    if (blk.header.prev_hash != tip.hash())
+        return false;
+
+    return true;
+}
+
 } // namespace bc
