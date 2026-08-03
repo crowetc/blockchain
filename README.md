@@ -20,8 +20,15 @@ The diagram below shows the high-level relationships between these components.
 ![Architecture Diagram](docs/architecture-simple.png)
 
 ## Build
-Requires a C++17 compiler.
-This project uses Google Test and CTest for unit testing
+
+### Dependencies
+This project requires the following tools and libraries:
+
+- **C++17 compiler** — GCC, Clang, or MSVC  
+- **CMake 3.10+** — for configuring the build  
+- **libsodium** — used for cryptographic hashing and signatures  
+- **GoogleTest** — used for unit tests (automatically fetched via CMake)  
+- **Make** or **Ninja** — any standard build tool supported by CMake
 
 ### Using CMake
 ```bash
