@@ -64,6 +64,10 @@ public:
     const Block&
     get_block(std::size_t index) const;
 
+    
+    bool
+    contains(const std::string& hash) const;
+
     /** Validate the entire chain.
      *  @return @c true if the chain is valid
      *  @return @c false if any block is inconsistent
@@ -107,6 +111,7 @@ Chain::
 add_block(const Block& blk)
 {
     chain_.push_back(blk);
+    block_hashes_.insert(blk.hash());
 }
 
 inline
@@ -120,6 +125,14 @@ get_block(std::size_t index) const
     }
 
     return chain_[index];
+}
+
+inline
+bool
+Chain::
+contains(const std::string& hash) const
+{
+    return block_hashes_.count(hash) > 0;
 }
 
 } // namespace bc

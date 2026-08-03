@@ -89,8 +89,7 @@ TEST(node_test, node_processes_new_transaction)
         auto raw_msg = raw->receive();
         if (!raw_msg.empty())
         {
-            auto decoded = bc::Message::decode(raw_msg);
-            node.submit(tx);
+            node.receive_message(raw_msg);
         }
     }
 

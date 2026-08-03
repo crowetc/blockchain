@@ -48,7 +48,8 @@ TEST(chain_test, add_block_increases_size)
     t2.sign(sk);
     txs2.push_back(t2);
 
-    chain.create_block(txs2);
+    auto blk2 = chain.create_block(txs2);
+    chain.add_block(blk2);
     EXPECT_EQ(chain.size(), 2u);
 }
 
@@ -72,7 +73,8 @@ TEST(chain_test, valid_chain_passes_validation)
     t2.sign(sk);
     txs2.push_back(t2);
 
-    chain.create_block(txs2);
+    auto blk2 = chain.create_block(txs2);
+    chain.add_block(blk2);
 
     EXPECT_TRUE(chain.validate());
 }
@@ -97,7 +99,8 @@ TEST(chain_test, tampered_hash_fails_validation)
     t2.sign(sk);
     txs2.push_back(t2);
 
-    chain.create_block(txs2);
+    auto blk2 = chain.create_block(txs2);
+    chain.add_block(blk2);
     EXPECT_TRUE(chain.validate());
 
     // Tamper with second block's hash via const_cast

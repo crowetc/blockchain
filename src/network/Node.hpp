@@ -68,6 +68,13 @@ public:
     void
     broadcast(const Message& msg);
 
+    /** Process a raw inbound message from the network.
+     *
+     *  Decodes the message and dispatches it through the node's internal consensus logic.
+     */
+    void
+    receive_message(const std::string& raw);
+
     /** Submit a transaction to the mempool and broadcast it to peers. */
     void
     submit(const Transaction& tx);

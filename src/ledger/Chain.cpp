@@ -13,7 +13,7 @@ Chain(const std::vector<Transaction>& txs,
     // Genesis block has no previous hash
     Block genesis(txs, "0", difficulty_);
     genesis.mine();
-    chain_.push_back(genesis);
+    this->add_block(genesis);
 }
 
 bool

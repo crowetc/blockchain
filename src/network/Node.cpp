@@ -44,6 +44,17 @@ broadcast(const Message& msg)
 
 void
 Node::
+receive_message(const std::string& raw)
+{
+    if (raw.empty())
+        return;
+
+    Message msg = Message::decode(raw);
+    handle_message(msg);   // still private
+}
+
+void
+Node::
 submit(const Transaction& tx)
 {
     mempool_.push_back(tx);
@@ -56,7 +67,11 @@ void
 Node::
 mine()
 {
-    chain_.create_block(mempool_);
+    if (mempool_.empty())
+        return;
+
+    Block blk = chain_.create_block(mempool_);
+    chain_.add_block(blk);
     mempool_.clear();
 
     const Block& b = chain_.get_block(chain_.size() - 1);
@@ -68,6 +83,11 @@ bool
 Node::
 validate(const Block& blk)
 {
+    // Already have this block?
+    if (chain_.contains(blk.hash()))
+        return false;
+
+    // Basic block validity
     if (!blk.validate())
         return false;
 
@@ -96,12 +116,11 @@ listen()
             if (!peer->connected())
                 continue;
 
-            std::string raw = peer->receive();
+            auto raw = peer->receive();
             if (raw.empty())
                 continue;
 
-            Message msg = Message::decode(raw);
-            handle_message(msg);
+            receive_message(raw);
         }
     }
 }
