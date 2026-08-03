@@ -56,12 +56,31 @@ void
 Node::
 mine()
 {
-    chain_.add_block(mempool_);
+    chain_.create_block(mempool_);
     mempool_.clear();
 
     const Block& b = chain_.get_block(chain_.size() - 1);
     Message msg{ Message_type::NEW_BLOCK, b.serialize() };
     broadcast(msg);
+}
+
+bool
+Node::
+validate(const Block& blk)
+{
+    if (!blk.validate())
+        return false;
+
+    // Check chain continuity
+    const Block& tip = chain_.get_block(chain_.size() - 1);
+    if (blk.header.prev_hash != tip.hash())
+    {
+        // Parent not found -> orphan
+        orphans_.emplace(blk.header.prev_hash, blk);
+        return false;
+    }
+
+    return true;
 }
 
 void
@@ -94,31 +113,35 @@ handle_message(const Message& msg)
     if (msg.payload.empty())
         return;
 
-    if (msg.type == Message_type::NEW_TRANSACTION)
+    switch (msg.type)
     {
-        Transaction tx = Transaction::deserialize(msg.payload);
-        mempool_.push_back(tx);
+        case Message_type::NEW_TRANSACTION:
+        {
+            Transaction tx = Transaction::deserialize(msg.payload);
+
+            if (validate(tx))
+            {
+                mempool_.push_back(tx);
+                broadcast(msg);   // rebroadcast only valid tx
+            }
+            break;
+        }
+
+        case Message_type::NEW_BLOCK:
+        {
+            Block blk = Block::deserialize(msg.payload);
+
+            if (validate(blk))
+            {
+                chain_.add_block(blk);
+                broadcast(msg);   // rebroadcast only valid block
+            }
+            break;
+        }
+
+        default:
+            break;
     }
-    else if (msg.type == Message_type::NEW_BLOCK)
-    {
-        Block b = Block::deserialize(msg.payload);
-        chain_.add_block(b.body.transactions);
-    }
-}
-
-bool
-Node::
-validate(const Block& blk)
-{
-    if (!blk.validate())
-        return false;
-
-    // Check chain continuity
-    const Block& tip = chain_.get_block(chain_.size() - 1);
-    if (blk.header.prev_hash != tip.hash())
-        return false;
-
-    return true;
 }
 
 } // namespace bc

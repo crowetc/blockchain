@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 #include "Block.hpp"
@@ -38,11 +39,24 @@ public:
     uint32_t
     difficulty() const;
     
-    /** Add a new block to the chain.
-     *  @param txs the transactions to incorporate into the block.
+    /** Create and mine a new block.
+     *  @param txs the transactions to include in the block.
+     *
+     *  Constructs a block using the current chain tip and performs
+     *  proof‑of‑work. The caller is responsible for adding the mined
+     *  block to the chain.
+     */
+    Block
+    create_block(const std::vector<Transaction>& txs);
+
+    /** Append an existing block to the chain.
+     *
+     *  Used for incorporating blocks received from the network or
+     *  resolved orphan blocks. Assumes the block has already been
+     *  validated.
      */
     void
-    add_block(const std::vector<Transaction>& txs);
+    add_block(const Block& blk);
 
     /** Return a block by index.
      *  @param index the index of the block to return.
@@ -64,6 +78,7 @@ public:
 private:
     uint32_t difficulty_;
     std::vector<Block> chain_;
+    std::unordered_set<std::string> block_hashes_;
 };
 
 //
@@ -84,6 +99,14 @@ Chain::
 difficulty() const
 {
     return difficulty_;
+}
+
+inline
+void
+Chain::
+add_block(const Block& blk)
+{
+    chain_.push_back(blk);
 }
 
 inline

@@ -31,7 +31,8 @@ int main()
         Transaction{"alice", "bob", 50},
         Transaction{"carol", "dave", 20}
     };
-    chain.add_block(block1_txs);
+    auto blk1 = chain.create_block(block1_txs);
+    chain.add_block(blk1);
 
     //
     // Block 2
@@ -41,7 +42,8 @@ int main()
     {
         Transaction{"bob", "eve", 10}
     };
-    chain.add_block(block2_txs);
+    auto blk2 = chain.create_block(block2_txs);
+    chain.add_block(blk2);
 
     //
     // Block 3
@@ -51,7 +53,8 @@ int main()
     {
         Transaction{"dave", "frank", 5}
     };
-    chain.add_block(block3_txs);
+    auto blk3 = chain.create_block(block3_txs);
+    chain.add_block(blk3);
 
     //
     // Validate Chain

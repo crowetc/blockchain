@@ -34,15 +34,15 @@ validate() const
     return true;
 }
 
-void
+Block
 Chain::
-add_block(const std::vector<Transaction>& txs)
+create_block(const std::vector<Transaction>& txs)
 {
     const std::string prev_hash = chain_.back().hash();
 
-    Block block = Block(txs, prev_hash, difficulty_);
-    block.mine();
-    chain_.push_back(std::move(block));
+    Block blk(txs, prev_hash, difficulty_);
+    blk.mine();
+    return blk;
 }
 
 

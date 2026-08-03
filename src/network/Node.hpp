@@ -86,8 +86,23 @@ private:
     // Blockchain
     Chain chain_;
     std::vector<Transaction> mempool_;
+    std::unordered_map<std::string, Block> orphans_;
 
     std::atomic<bool> running_;
+
+    /** Validate a transaction at the node level.
+     *
+     *  Performs basic structural checks and node‑specific policy checks.
+     */
+    bool
+    validate(const Transaction& tx);
+
+    /** Validate a block at the node level.
+     *
+     *  Ensures the block is valid and correctly extends the local chain tip.
+     */
+    bool
+    validate(const Block& blk);
 
     /** Listener loop executed in the background thread.
      *
@@ -105,20 +120,6 @@ private:
      */
     void
     handle_message(const Message& msg);
-
-    /** Validate a transaction at the node level.
-     *
-     *  Performs basic structural checks and node‑specific policy checks.
-     */
-    bool
-    validate(const Transaction& tx);
-
-    /** Validate a block at the node level.
-     *
-     *  Ensures the block is valid and correctly extends the local chain tip.
-     */
-    bool
-    validate(const Block& blk);
 };
 
 //
