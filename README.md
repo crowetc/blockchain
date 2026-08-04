@@ -38,3 +38,8 @@ cmake ..
 make
 ctest
 ```
+
+## Contact
+If you’d like to discuss this project, feel free to reach out:
+
+**tim.crowe.dev@proton.me**

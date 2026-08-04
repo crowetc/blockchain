@@ -1,0 +1,32 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "Ledger" {
+    class Chain
+    class Block
+    class Transaction
+}
+
+package "Network" {
+    class Node
+    interface Peer
+    class Message
+}
+
+Node *-- "1" Chain
+Node *-- "0..*" Peer
+Chain *-- "1..*" Block
+Block *-- "0..*" Transaction
+
+Node ..> Message : constructs
+Peer ..> Message : forwards
+
+note bottom of Message
+    Types:
+    - NEW_TRANSACTION
+    - NEW_BLOCK
+end note
+
+@enduml
