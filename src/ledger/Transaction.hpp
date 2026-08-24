@@ -2,6 +2,7 @@
 #define TRANSACTION_HPP_
 
 #include <array>
+#include <cstdint>
 #include <ctime>
 #include <string>
 #include <vector>
