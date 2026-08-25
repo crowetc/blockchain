@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <stdexcept>
 #include <unordered_set>
 #include <vector>
 
@@ -103,36 +104,6 @@ Chain::
 difficulty() const
 {
     return difficulty_;
-}
-
-inline
-void
-Chain::
-add_block(const Block& blk)
-{
-    chain_.push_back(blk);
-    block_hashes_.insert(blk.hash());
-}
-
-inline
-const Block&
-Chain::
-get_block(std::size_t index) const
-{
-    if (index >= chain_.size())
-    {
-        throw std::invalid_argument("Index does not exist.");  
-    }
-
-    return chain_[index];
-}
-
-inline
-bool
-Chain::
-contains(const std::string& hash) const
-{
-    return block_hashes_.count(hash) > 0;
 }
 
 } // namespace bc

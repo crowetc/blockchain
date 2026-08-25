@@ -1,8 +1,11 @@
 #include "Block.hpp"
 #include "crypto_utils.hpp"
 #include "Merkle_tree.hpp"
+#include "Transaction.hpp"
 
+#include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 namespace bc
 {
@@ -32,7 +35,7 @@ std::string
 Block::
 compute_hash() const
 {
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << header.prev_hash
        << header.merkle_root
        << header.time
@@ -48,11 +51,14 @@ mine()
 {
     std::string target(header.difficulty, '0');
 
-    do
+    while (true)
     {
         header.nonce++;
         hash_ = compute_hash();
-    } while (hash_.substr(0, header.difficulty) != target);
+
+        if (hash_.compare(0, header.difficulty, target) == 0)
+            break;
+    }
 
     std::cout << "Block mined: " << hash_ << '\n';
 }
@@ -62,20 +68,22 @@ Block::
 validate() const
 {
     // Check Merkle Root
-    if (compute_merkle_root() != header.merkle_root) { return false; }
+    if (compute_merkle_root() != header.merkle_root)
+        return false;
 
     // Check Hash
-    if (compute_hash() != hash_) { return false; }
+    if (compute_hash() != hash_)
+        return false;
 
     // Check Hash matches Difficulty
-    std::string target(header.difficulty, '0');
-    if (hash_.substr(0, header.difficulty) != target) { return false; }
+    const std::string target(header.difficulty, '0');
+    if (hash_.compare(0, header.difficulty, target) != 0)
+        return false;
 
     // Check Transactions
     for (const auto& tx : body.transactions)
-    {
-        if (!tx.validate()) { return false; }
-    }
+        if (!tx.validate())
+            return false;
 
     return true;
 }
@@ -84,14 +92,14 @@ std::string
 Block::
 serialize() const
 {
-    std::stringstream ss;
+    std::ostringstream ss;
 
     // Serialize header fields
-    ss << header.prev_hash << '|'
+    ss << header.prev_hash   << '|'
        << header.merkle_root << '|'
-       << header.time << '|'
-       << header.nonce << '|'
-       << header.difficulty << '|';
+       << header.time        << '|'
+       << header.nonce       << '|'
+       << header.difficulty  << '|';
 
     // Serialize transactions (semicolon-separated)
     for (std::size_t i = 0; i < body.transactions.size(); ++i)
@@ -108,124 +116,66 @@ Block
 Block::
 deserialize(const std::string& raw)
 {
-    // Find the delimiter after the five header fields.
-    std::size_t header_end = 0;
+    // Extract header section (5 fields)
+    std::size_t pos = 0;
+    std::size_t next = 0;
+    std::vector<std::string> fields;
+    fields.reserve(5);
 
     for (int i = 0; i < 5; ++i)
     {
-        header_end = raw.find('|', header_end);
+        next = raw.find('|', pos);
+        if (next == std::string::npos)
+            throw std::invalid_argument("Invalid block serialization.");
 
-        if (header_end == std::string::npos)
-        {
-            throw std::invalid_argument(
-                "Invalid block serialization."
-            );
-        }
-
-        ++header_end;
-    }
-
-    // Split header from transactions.
-    const std::string header_part =
-        raw.substr(0, header_end - 1);
-
-    const std::string tx_part =
-        raw.substr(header_end);
-
-    // Parse header fields.
-    std::vector<std::string> fields;
-
-    std::size_t pos = 0;
-    std::size_t next;
-
-    while ((next = header_part.find('|', pos))
-           != std::string::npos)
-    {
-        fields.push_back(
-            header_part.substr(pos, next - pos)
-        );
-
+        fields.emplace_back(raw.substr(pos, next - pos));
         pos = next + 1;
     }
 
-    // Add the final header field.
-    fields.push_back(header_part.substr(pos));
-
-    if (fields.size() != 5)
-    {
-        throw std::invalid_argument(
-            "Invalid block serialization."
-        );
-    }
+    // Remaining part is transaction list
+    const std::string tx_part = raw.substr(pos);
 
     Block_header hdr;
-
     try
     {
-        hdr.prev_hash = fields[0];
+        hdr.prev_hash   = fields[0];
         hdr.merkle_root = fields[1];
-        hdr.time = std::stoll(fields[2]);
-        hdr.nonce = std::stoull(fields[3]);
-        hdr.difficulty = std::stoul(fields[4]);
+        hdr.time        = std::stoll(fields[2]);
+        hdr.nonce       = std::stoull(fields[3]);
+        hdr.difficulty  = std::stoul(fields[4]);
     }
-    catch (const std::exception&)
+    catch (...)
     {
-        throw std::invalid_argument(
-            "Invalid block serialization."
-        );
+        throw std::invalid_argument("Invalid block serialization.");
     }
 
     // Parse transactions
     std::vector<Transaction> txs;
-
     pos = 0;
 
-    while ((next = tx_part.find(';', pos))
-           != std::string::npos)
+    while ((next = tx_part.find(';', pos)) != std::string::npos)
     {
-        txs.push_back(
-            Transaction::deserialize(
-                tx_part.substr(pos, next - pos)
-            )
-        );
-
+        txs.emplace_back(Transaction::deserialize(tx_part.substr(pos, next - pos)));
         pos = next + 1;
     }
 
     if (pos < tx_part.size())
-    {
-        txs.push_back(
-            Transaction::deserialize(
-                tx_part.substr(pos)
-            )
-        );
-    }
+        txs.emplace_back(Transaction::deserialize(tx_part.substr(pos)));
 
-    // Reconstruct the block.
-    Block block(
-        txs,
-        hdr.prev_hash,
-        hdr.difficulty
-    );
-
-    // Restore the original serialized header.
+    // Reconstruct block
+    Block block(txs, hdr.prev_hash, hdr.difficulty);
     block.header = hdr;
-
-    // Recompute the hash using the restored header.
-    block.hash_ = block.compute_hash();
+    block.hash_  = block.compute_hash();
 
     return block;
 }
-
 
 std::string
 Block::
 compute_merkle_root() const
 {
     if (body.transactions.empty())
-    {
         return sha256_hex("");
-    }
 
     Merkle_tree tree(body.transactions);
     return tree.root();

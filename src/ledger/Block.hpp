@@ -3,13 +3,14 @@
 
 #include <cstdint>
 #include <ctime>
-#include <iostream>
+#include <string>
 #include <vector>
-
-#include "Transaction.hpp"
 
 namespace bc
 {
+
+// Forward declaration
+class Transaction;
 
 /** Block header
  * 
