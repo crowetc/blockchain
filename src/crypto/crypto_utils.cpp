@@ -2,11 +2,52 @@
 
 #include "crypto_utils.hpp"
 
+#include <stdexcept>
+
 namespace bc
 {
 
     // Initialize libsodium
     static bool sodium_ready = (sodium_init() >= 0);
+
+    //
+    // Hex Helpers
+    //
+
+    std::string
+    to_hex(const unsigned char* data, std::size_t len)
+    {
+        // libsodium guarantees hex_len = 2*len + 1 for null terminator
+        std::string out;
+        out.resize(len * 2);
+
+        sodium_bin2hex(
+            out.data(), out.size() + 1,
+            data, len
+        );
+
+        return out;
+    }
+
+    std::vector<unsigned char>
+    from_hex(const std::string& hex)
+    {
+        std::vector<unsigned char> out(hex.size() / 2);
+
+        std::size_t bin_len = 0;
+
+        if (sodium_hex2bin(
+                out.data(), out.size(),
+                hex.data(), hex.size(),
+                nullptr, &bin_len, nullptr
+            ) != 0)
+        {
+            throw std::invalid_argument("Invalid hex encoding.");
+        }
+
+        out.resize(bin_len);
+        return out;
+    }
 
     //
     // Hashing
@@ -23,9 +64,7 @@ namespace bc
             data.size()
         );
 
-        char hex[crypto_hash_sha256_BYTES * 2 + 1];
-        sodium_bin2hex(hex, sizeof hex, hash, crypto_hash_sha256_BYTES);
-        return std::string(hex);
+        return to_hex(hash, crypto_hash_sha256_BYTES);
     }
 
     std::string
@@ -40,9 +79,7 @@ namespace bc
             nullptr, 0
         );
 
-        char hex[crypto_generichash_BYTES * 2 + 1];
-        sodium_bin2hex(hex, sizeof hex, hash, crypto_generichash_BYTES);
-        return std::string(hex);
+        return to_hex(hash, crypto_generichash_BYTES);
     }
 
     //
