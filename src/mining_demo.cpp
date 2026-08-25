@@ -29,7 +29,7 @@ void print_block(const Block& blk, int index)
 
 int main()
 {
-    uint32_t difficulty = 4;
+    std::uint32_t difficulty = 4;
 
     std::vector<Transaction> genesis_txs =
     {

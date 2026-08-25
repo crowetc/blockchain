@@ -10,7 +10,7 @@ namespace bc
 Block::
 Block(const std::vector<Transaction>& txs,
       const std::string& prev_hash,
-      uint32_t difficulty)
+      std::uint32_t difficulty)
 {
     // Fill body
     body.transactions = txs;
@@ -108,45 +108,113 @@ Block
 Block::
 deserialize(const std::string& raw)
 {
-    // Split header from transaction list
-    auto header_end = raw.find_last_of('|');
-    std::string header_part = raw.substr(0, header_end);
-    std::string tx_part = raw.substr(header_end + 1);
+    // Find the delimiter after the five header fields.
+    std::size_t header_end = 0;
 
-    // Parse header fields
-    std::vector<std::string> fields;
-    std::size_t pos = 0, next;
-    while ((next = header_part.find('|', pos)) != std::string::npos)
+    for (int i = 0; i < 5; ++i)
     {
-        fields.push_back(header_part.substr(pos, next - pos));
+        header_end = raw.find('|', header_end);
+
+        if (header_end == std::string::npos)
+        {
+            throw std::invalid_argument(
+                "Invalid block serialization."
+            );
+        }
+
+        ++header_end;
+    }
+
+    // Split header from transactions.
+    const std::string header_part =
+        raw.substr(0, header_end - 1);
+
+    const std::string tx_part =
+        raw.substr(header_end);
+
+    // Parse header fields.
+    std::vector<std::string> fields;
+
+    std::size_t pos = 0;
+    std::size_t next;
+
+    while ((next = header_part.find('|', pos))
+           != std::string::npos)
+    {
+        fields.push_back(
+            header_part.substr(pos, next - pos)
+        );
+
         pos = next + 1;
     }
 
+    // Add the final header field.
+    fields.push_back(header_part.substr(pos));
+
+    if (fields.size() != 5)
+    {
+        throw std::invalid_argument(
+            "Invalid block serialization."
+        );
+    }
+
     Block_header hdr;
-    hdr.prev_hash = fields[0];
-    hdr.merkle_root = fields[1];
-    hdr.time = std::stoll(fields[2]);
-    hdr.nonce = std::stoull(fields[3]);
-    hdr.difficulty = std::stoul(fields[4]);
+
+    try
+    {
+        hdr.prev_hash = fields[0];
+        hdr.merkle_root = fields[1];
+        hdr.time = std::stoll(fields[2]);
+        hdr.nonce = std::stoull(fields[3]);
+        hdr.difficulty = std::stoul(fields[4]);
+    }
+    catch (const std::exception&)
+    {
+        throw std::invalid_argument(
+            "Invalid block serialization."
+        );
+    }
 
     // Parse transactions
     std::vector<Transaction> txs;
+
     pos = 0;
-    while ((next = tx_part.find(';', pos)) != std::string::npos)
+
+    while ((next = tx_part.find(';', pos))
+           != std::string::npos)
     {
-        txs.push_back(Transaction::deserialize(tx_part.substr(pos, next - pos)));
+        txs.push_back(
+            Transaction::deserialize(
+                tx_part.substr(pos, next - pos)
+            )
+        );
+
         pos = next + 1;
     }
 
     if (pos < tx_part.size())
-        txs.push_back(Transaction::deserialize(tx_part.substr(pos)));
+    {
+        txs.push_back(
+            Transaction::deserialize(
+                tx_part.substr(pos)
+            )
+        );
+    }
 
-    // Reconstruct block
-    Block b(txs, hdr.prev_hash, hdr.difficulty);
-    b.header = hdr;
-    b.hash_ = b.compute_hash();
+    // Reconstruct the block.
+    Block block(
+        txs,
+        hdr.prev_hash,
+        hdr.difficulty
+    );
 
-    return b;
+    // Restore the original serialized header.
+    block.header = hdr;
+
+    // Recompute the hash using the restored header.
+    block.hash_ = block.compute_hash();
+
+    return block;
 }
 
 

@@ -29,14 +29,14 @@ public:
      *  The chain is initialized with a single genesis block.
      */
     Chain(const std::vector<Transaction>& txs,
-          uint32_t difficulty);
+          std::uint32_t difficulty);
 
     /** The number of blocks in the chain. */
     std::size_t
     size() const;
 
     /** The mining difficulty. */
-    uint32_t
+    std::uint32_t
     difficulty() const;
     
     /** Create and mine a new block.
@@ -80,7 +80,7 @@ public:
     validate() const;
 
 private:
-    uint32_t difficulty_;
+    std::uint32_t difficulty_;
     std::vector<Block> chain_;
     std::unordered_set<std::string> block_hashes_;
 };
@@ -98,7 +98,7 @@ size() const
 }
 
 inline
-uint32_t
+std::uint32_t
 Chain::
 difficulty() const
 {

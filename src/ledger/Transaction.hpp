@@ -19,7 +19,7 @@ class Transaction
 public:
     Transaction(const std::string& sender,
                 const std::string& receiver,
-                uint64_t amount,
+                std::uint64_t amount,
                 std::time_t timestamp = std::time(nullptr));
 
     //
@@ -32,7 +32,7 @@ public:
     const std::string&
     receiver() const;
 
-    uint64_t
+    std::uint64_t
     amount() const;
 
     std::time_t
@@ -72,7 +72,7 @@ private:
     // Core fields
     std::string sender_;
     std::string receiver_;
-    uint64_t amount_;
+    std::uint64_t amount_;
     std::time_t timestamp_;
 
     // Cryptographic fields
@@ -101,7 +101,7 @@ receiver() const
 }
 
 inline
-uint64_t
+std::uint64_t
 Transaction::
 amount() const
 {

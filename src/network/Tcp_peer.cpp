@@ -9,7 +9,7 @@ namespace bc
 {
 
 Tcp_peer::
-Tcp_peer(const std::string& host, uint16_t port)
+Tcp_peer(const std::string& host, std::uint16_t port)
 : host_(host), port_(port), socket_fd_(-1), connected_(false)
 {}
 

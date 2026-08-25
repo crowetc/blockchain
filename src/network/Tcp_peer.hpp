@@ -26,11 +26,11 @@ public:
      *  The peer is not connected upon construction; connect() must be called
      *  explicitly.
      */
-    Tcp_peer(const std::string& host, uint16_t port);
+    Tcp_peer(const std::string& host, std::uint16_t port);
 
 private:
     std::string host_;
-    uint16_t port_;
+    std::uint16_t port_;
     int socket_fd_;
     bool connected_;
 

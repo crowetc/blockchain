@@ -57,12 +57,11 @@ public:
     /** Decode a raw string into a Message object.
      *  @param raw The encoded message string.
      *  @return A reconstructed Message instance.
+     *  @throws std::invalid_argument if the encoded message is malformed
+     *          or contains an invalid message type.
      *
      *  Inverse of encode(). Splits the raw string at the first delimiter
      *  and reconstructs the Message_type and payload.
-     *
-     *  Malformed Messages are decoded with Message_type::NEW_TRANSACTION
-     *  and an empty payload.
      */
     static Message
     decode(const std::string& raw);

@@ -20,7 +20,7 @@ class Test_peer : public Peer
 {
 public:
 
-    Test_peer(const std::string& host, uint16_t port)
+    Test_peer(const std::string& host, std::uint16_t port)
         : host_(host), port_(port), connected_(true)
     {}
 
@@ -44,7 +44,7 @@ public:
 
 private:
     std::string host_;
-    uint16_t port_;
+    std::uint16_t port_;
     bool connected_;
 
     std::vector<std::string> inbox_;

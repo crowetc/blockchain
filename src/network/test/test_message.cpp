@@ -55,10 +55,10 @@ TEST(message_test, malformed_no_delimiter)
 {
     std::string raw = "12345"; // no '|'
 
-    auto decoded = bc::Message::decode(raw);
-
-    EXPECT_EQ(decoded.type, bc::Message_type::NEW_TRANSACTION);
-    EXPECT_TRUE(decoded.payload.empty());
+    EXPECT_THROW(
+        bc::Message::decode(raw),
+        std::invalid_argument
+    );
 }
 
 // Check decoding of malformed message with an invalid Message_type
@@ -66,10 +66,10 @@ TEST(message_test, malformed_type_field)
 {
     std::string raw = "not_an_int|payload";
 
-    auto decoded = bc::Message::decode(raw);
-
-    EXPECT_EQ(decoded.type, bc::Message_type::NEW_TRANSACTION);
-    EXPECT_TRUE(decoded.payload.empty());
+    EXPECT_THROW(
+        bc::Message::decode(raw),
+        std::invalid_argument
+    );
 }
 
 // Validate that the encoded message formats delimiters appropriately

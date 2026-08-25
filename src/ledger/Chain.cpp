@@ -7,7 +7,7 @@ namespace bc
 
 Chain::
 Chain(const std::vector<Transaction>& txs,
-      uint32_t difficulty)
+      std::uint32_t difficulty)
 : difficulty_(difficulty)
 {
     // Genesis block has no previous hash

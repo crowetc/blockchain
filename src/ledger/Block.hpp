@@ -17,11 +17,11 @@ namespace bc
  */
 struct Block_header
 {
-    std::string prev_hash;   // hash of the previous block
-    std::string merkle_root; // merkle root of all transactions
-    time_t time;             // timestamp
-    uint64_t nonce;          // proof-of-work nonce
-    uint32_t difficulty;     // mining difficulty
+    std::string prev_hash;    // hash of the previous block
+    std::string merkle_root;  // merkle root of all transactions
+    std::time_t time;         // timestamp
+    std::uint64_t nonce;      // proof-of-work nonce
+    std::uint32_t difficulty; // mining difficulty
 };
 
 /** Block body
@@ -50,7 +50,7 @@ public:
      */
     Block(const std::vector<Transaction>& txs,
           const std::string& prev_hash,
-          uint32_t difficulty);
+          std::uint32_t difficulty);
 
     /** The hash of this block. */
     const std::string&

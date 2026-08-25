@@ -1,7 +1,9 @@
 #include "crypto_utils.hpp"
 #include "Transaction.hpp"
 
+#include <algorithm>
 #include <sstream>
+#include <stdexcept>
 
 namespace bc
 {
@@ -9,7 +11,7 @@ namespace bc
 Transaction::
 Transaction(const std::string& sender,
             const std::string& receiver,
-            uint64_t amount,
+            std::uint64_t amount,
             std::time_t timestamp)
 : sender_(sender),
   receiver_(receiver),
@@ -21,7 +23,7 @@ Transaction(const std::string& sender,
         throw std::invalid_argument("Transaction participants cannot be empty.");
     }
 
-    if (amount <= 0)
+    if (amount == 0)
     {
         throw std::invalid_argument("Transaction amount must be positive.");
     }
@@ -49,9 +51,14 @@ Transaction::
 validate() const
 {
     // Check structure
-    if (sender_.empty() || receiver_.empty()) { return false; }
-    if (amount_ <= 0) { return false; }
-    if (sender_ == receiver_) return false;
+    if (sender_.empty() || receiver_.empty())
+        return false;
+
+    if (sender_ == receiver_)
+        return false;
+
+    if (amount_ == 0)
+        return false;
 
     // Signature validation disabled until signatures are serialized
     return true;
@@ -69,39 +76,142 @@ serialize() const
     return ss.str();
 }
 
+namespace
+{
+
+std::string
+read_field(const std::string& input,
+           std::size_t& pos)
+{
+    const auto next = input.find('|', pos);
+
+    if (next == std::string::npos)
+        throw std::invalid_argument(
+            "Invalid transaction serialization."
+        );
+
+    std::string field = input.substr(
+        pos,
+        next - pos
+    );
+
+    pos = next + 1;
+
+    return field;
+}
+
+} // namespace anonymous
+
 Transaction
 Transaction::
 deserialize(const std::string& raw)
 {
-    // Expected format:
-    // sender|receiver|amount|timestamp
+    if (raw.empty())
+    {
+        throw std::invalid_argument(
+            "Invalid transaction serialization."
+        );
+    }
 
     std::size_t pos = 0;
-    std::size_t next;
 
-    // Parse sender
-    next = raw.find('|', pos);
-    std::string sender = raw.substr(pos, next - pos);
-    pos = next + 1;
+    auto read_field =
+        [&raw, &pos]() -> std::string
+        {
+            const std::size_t next =
+                raw.find('|', pos);
 
-    // Parse receiver
-    next = raw.find('|', pos);
-    std::string receiver = raw.substr(pos, next - pos);
-    pos = next + 1;
+            if (next == std::string::npos)
+            {
+                throw std::invalid_argument(
+                    "Invalid transaction serialization."
+                );
+            }
 
-    // Parse amount
-    next = raw.find('|', pos);
-    uint64_t amount = std::stoull(raw.substr(pos, next - pos));
-    pos = next + 1;
+            const std::string field =
+                raw.substr(
+                    pos,
+                    next - pos
+                );
 
-    // Parse timestamp
-    std::time_t timestamp = std::stoll(raw.substr(pos));
+            pos = next + 1;
 
-    // Reconstruct the transaction
-    Transaction tx(sender, receiver, amount, timestamp);
+            return field;
+        };
 
-    return tx;
+    const std::string sender =
+        read_field();
+
+    const std::string receiver =
+        read_field();
+
+    const std::string amount_string =
+        read_field();
+
+    // The timestamp is the remainder.
+    const std::string timestamp_string =
+        raw.substr(pos);
+
+    if (sender.empty() ||
+        receiver.empty() ||
+        amount_string.empty() ||
+        timestamp_string.empty())
+    {
+        throw std::invalid_argument(
+            "Invalid transaction serialization."
+        );
+    }
+
+    try
+    {
+        std::size_t parsed = 0;
+
+        const std::uint64_t amount =
+            std::stoull(
+                amount_string,
+                &parsed
+            );
+
+        if (parsed != amount_string.size())
+        {
+            throw std::invalid_argument(
+                "Invalid transaction amount."
+            );
+        }
+
+        parsed = 0;
+
+        const long long timestamp_value =
+            std::stoll(
+                timestamp_string,
+                &parsed
+            );
+
+        if (parsed != timestamp_string.size())
+        {
+            throw std::invalid_argument(
+                "Invalid transaction timestamp."
+            );
+        }
+
+        const std::time_t timestamp =
+            static_cast<std::time_t>(
+                timestamp_value
+            );
+
+        return Transaction(
+            sender,
+            receiver,
+            amount,
+            timestamp
+        );
+    }
+    catch (const std::exception&)
+    {
+        throw std::invalid_argument(
+            "Invalid transaction serialization."
+        );
+    }
 }
-
 
 } // namespace bc

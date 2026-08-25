@@ -21,35 +21,80 @@ Message
 Message::
 decode(const std::string& raw)
 {
-    // Find delimiter
-    std::size_t pos = raw.find('|');
+    const std::size_t pos = raw.find('|');
+
+    // A valid message must contain a type/payload delimiter.
     if (pos == std::string::npos)
     {
-        // Malformed: no delimiter
-        return Message(Message_type::NEW_TRANSACTION, "");
+        throw std::invalid_argument(
+            "Invalid message: missing delimiter."
+        );
     }
 
-    // Extract type field
-    std::string type_str = raw.substr(0, pos);
-    int type_int = 0;
+    // Extract the type field.
+    const std::string type_str =
+        raw.substr(0, pos);
+
+    if (type_str.empty())
+    {
+        throw std::invalid_argument(
+            "Invalid message: empty type field."
+        );
+    }
+
+    int type_int;
 
     try
     {
-        type_int = std::stoi(type_str);
+        std::size_t parsed = 0;
+
+        type_int = std::stoi(
+            type_str,
+            &parsed
+        );
+
+        // std::stoi("1abc") succeeds unless we verify that the
+        // entire field was consumed.
+        if (parsed != type_str.size())
+        {
+            throw std::invalid_argument(
+                "Invalid message type."
+            );
+        }
     }
-    catch (...)
+    catch (const std::exception&)
     {
-        // Malformed type field
-        return Message(Message_type::NEW_TRANSACTION, "");
+        throw std::invalid_argument(
+            "Invalid message type."
+        );
     }
 
-    // Convert integer to enum
-    Message_type type = Message_type::NEW_TRANSACTION;
-    if (type_int == static_cast<int>(Message_type::NEW_BLOCK))
-        type = Message_type::NEW_BLOCK;
+    Message_type type;
 
-    // Extract payload
-    std::string payload = raw.substr(pos + 1);
+    switch (type_int)
+    {
+        case static_cast<int>(
+            Message_type::NEW_TRANSACTION
+        ):
+            type = Message_type::NEW_TRANSACTION;
+            break;
+
+        case static_cast<int>(
+            Message_type::NEW_BLOCK
+        ):
+            type = Message_type::NEW_BLOCK;
+            break;
+
+        default:
+            throw std::invalid_argument(
+                "Invalid message type."
+            );
+    }
+
+    // Everything after the FIRST delimiter is the payload.
+    // This preserves payloads containing '|'.
+    const std::string payload =
+        raw.substr(pos + 1);
 
     return Message(type, payload);
 }

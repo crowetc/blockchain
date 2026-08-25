@@ -41,7 +41,7 @@ public:
      *  @param port The local port this node will listen on
      *  @param difficulty Mining difficulty
      */
-    Node(uint16_t port, uint32_t difficulty);
+    Node(std::uint16_t port, std::uint32_t difficulty);
 
     /** Start the node.
      *
@@ -85,7 +85,7 @@ public:
 
 private:
     // Networking
-    uint16_t port_;
+    std::uint16_t port_;
     std::unordered_map<std::string, std::unique_ptr<Peer>> peers_;
     std::mutex peer_mutex_;
     std::thread listener_;
@@ -135,7 +135,7 @@ private:
 
 inline
 Node::
-Node(uint16_t port, uint32_t difficulty)
+Node(std::uint16_t port, std::uint32_t difficulty)
 : port_(port),
   chain_({}, difficulty),
   running_(false)
