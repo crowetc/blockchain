@@ -77,7 +77,10 @@ private:
 
     // Cryptographic fields
     std::array<unsigned char, 32> public_key_{};
-    std::vector<unsigned char> signature_; 
+    std::vector<unsigned char> signature_;
+
+    std::string
+    signing_payload() const;
 };
 
 //

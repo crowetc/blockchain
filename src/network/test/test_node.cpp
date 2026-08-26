@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "crypto_utils.hpp"
 #include "Node.hpp"
 #include "Test_peer.hpp"
 #include "Transaction.hpp"
@@ -10,7 +11,13 @@
 static bc::Transaction
 make_tx()
 {
-    return bc::Transaction("alice", "bob", 10);
+    std::array<unsigned char, 32> pk{};
+    std::array<unsigned char, 64> sk{};
+    bc::generate_keypair(pk, sk);
+
+    bc::Transaction tx("alice", "bob", 10);
+    tx.sign(sk);
+    return tx;
 }
 
 // Helper: simple block
@@ -65,6 +72,7 @@ TEST(node_test, submit_broadcasts_new_transaction)
     EXPECT_EQ(decoded.sender(), tx.sender());
     EXPECT_EQ(decoded.receiver(), tx.receiver());
     EXPECT_EQ(decoded.amount(), tx.amount());
+    EXPECT_TRUE(decoded.validate());
 }
 
 // Verify inbound NEW_TRANSACTION adds to mempool (indirectly tested via mine())

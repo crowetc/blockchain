@@ -17,13 +17,14 @@ namespace bc
     std::string
     to_hex(const unsigned char* data, std::size_t len)
     {
-        // libsodium guarantees hex_len = 2*len + 1 for null terminator
         std::string out;
         out.resize(len * 2);
 
         sodium_bin2hex(
-            out.data(), out.size() + 1,
-            data, len
+            out.data(),
+            out.size() + 1,
+            data,
+            len
         );
 
         return out;
@@ -32,14 +33,23 @@ namespace bc
     std::vector<unsigned char>
     from_hex(const std::string& hex)
     {
+        if (hex.size() % 2 != 0)
+        {
+            throw std::invalid_argument("Invalid hex encoding.");
+        }
+
         std::vector<unsigned char> out(hex.size() / 2);
 
         std::size_t bin_len = 0;
 
         if (sodium_hex2bin(
-                out.data(), out.size(),
-                hex.data(), hex.size(),
-                nullptr, &bin_len, nullptr
+                out.data(),
+                out.size(),
+                hex.data(),
+                hex.size(),
+                nullptr,
+                &bin_len,
+                nullptr
             ) != 0)
         {
             throw std::invalid_argument("Invalid hex encoding.");
@@ -122,6 +132,9 @@ namespace bc
            const std::vector<unsigned char>& signature,
            const std::array<unsigned char, 32>& pk)
     {
+        // Reject signatures that don't match Ed25519 signature length
+        if (signature.size() != crypto_sign_BYTES)
+            return false;
 
         return crypto_sign_verify_detached(
             signature.data(),

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "crypto_utils.hpp"
 #include "Block.hpp"
 #include "Message.hpp"
 #include "Transaction.hpp"
@@ -89,7 +90,12 @@ TEST(message_test, encode_format)
 // Serialize and encode / decode and deserialize the same Transaction
 TEST(message_test, carries_serialized_transaction)
 {
+    std::array<unsigned char, 32> pk{};
+    std::array<unsigned char, 64> sk{};
+    bc::generate_keypair(pk, sk);
+
     bc::Transaction tx("alice", "bob", 10);
+    tx.sign(sk);
     auto serialized = tx.serialize();
 
     bc::Message m(bc::Message_type::NEW_TRANSACTION, serialized);
@@ -102,13 +108,22 @@ TEST(message_test, carries_serialized_transaction)
     EXPECT_EQ(tx2.sender(), tx.sender());
     EXPECT_EQ(tx2.receiver(), tx.receiver());
     EXPECT_EQ(tx2.amount(), tx.amount());
+    EXPECT_EQ(tx2.timestamp(), tx.timestamp());
+    EXPECT_EQ(tx2.public_key(), tx.public_key());
+    EXPECT_EQ(tx2.signature(), tx.signature());
+    EXPECT_TRUE(tx2.validate());
 }
 
 // Serialize and encode / decode and deserialize the same Block
 TEST(message_test, carries_serialized_block)
 {
+    std::array<unsigned char, 32> pk{};
+    std::array<unsigned char, 64> sk{};
+    bc::generate_keypair(pk, sk);
+
     std::vector<bc::Transaction> txs;
     bc::Transaction t1("alice","bob",10,std::time(nullptr));
+    t1.sign(sk);
     txs.push_back(t1);
 
     bc::Block b(txs, "0000", 4);

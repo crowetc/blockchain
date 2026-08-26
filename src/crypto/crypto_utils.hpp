@@ -8,6 +8,25 @@
 namespace bc
 {
     //
+    // Hex Encoding / Decoding
+    //
+
+    /** Convert binary @a data into a hex-encoded string.
+     *  @param data input binary
+     *  @param len size of binary input
+     *  @return Hex-encoded string
+     */
+    std::string
+    to_hex(const unsigned char* data, std::size_t len);
+
+    /** Convert a hex encoded string into binary.
+     *  @param hex hex string input
+     *  @return binary data
+     */
+    std::vector<unsigned char>
+    from_hex(const std::string& hex);
+
+    //
     // Hashing
     //
 
