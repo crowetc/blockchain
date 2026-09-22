@@ -135,3 +135,21 @@ TEST(node_test, mine_broadcasts_new_block)
     auto blk = bc::Block::deserialize(msg.payload);
     EXPECT_FALSE(blk.body.transactions.empty());
 }
+
+// Verify stop disconnects peers
+TEST(NodeTest, StopDisconnectsPeers)
+{
+    bc::Node node(8080, 1);
+
+    auto peer = std::make_unique<bc::Test_peer>("localhost", 8081);
+    auto* peer_ptr = peer.get();
+
+    node.add_peer(std::move(peer));
+
+    ASSERT_TRUE(peer_ptr->connected());
+
+    node.start();
+    node.stop();
+
+    EXPECT_FALSE(peer_ptr->connected());
+}
