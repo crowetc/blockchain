@@ -1,32 +1,48 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.20)
 
-project ("blockchain" LANGUAGES CXX)
+project(
+    blockchain
+    VERSION 0.1.0
+    LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+#
+# Testing
+#
+
+include(CTest)
 
 #
 # Dependencies
 #
 
-# --- Google Test ---
 include(FetchContent)
 
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
+# --- Google Test ---
+if(BUILD_TESTING)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
 
-FetchContent_MakeAvailable(googletest)
+    FetchContent_MakeAvailable(googletest)
+endif()
 
 # --- Libsodium ---
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(SODIUM REQUIRED libsodium)
+pkg_check_modules(
+    SODIUM
+    REQUIRED
+    IMPORTED_TARGET
+    libsodium
+)
 
-set(SODIUM_INCLUDE_DIRS ${SODIUM_INCLUDE_DIRS} CACHE INTERNAL "")
-set(SODIUM_LIBRARY_DIRS ${SODIUM_LIBRARY_DIRS} CACHE INTERNAL "")
-set(SODIUM_LIBRARIES ${SODIUM_LIBRARIES} CACHE INTERNAL "")
+#
+# Project
+#
 
-# build source
-enable_testing()
 add_subdirectory(src)

@@ -37,9 +37,14 @@ void
 Node::
 broadcast(const Message& msg)
 {
-    std::lock_guard<std::mutex> lock(peer_mutex_);
-    for (auto& [id, peer] : peers_)
-        peer->send(msg.encode());
+    auto peers = get_peers();
+    auto raw = msg.encode();
+
+    for (auto* peer : peers)
+    {
+        if (peer->connected())
+            peer->send(raw);
+    }
 }
 
 void
@@ -103,24 +108,38 @@ validate(const Block& blk)
     return true;
 }
 
+std::vector<Peer*>
+Node::
+get_peers()
+{
+    std::lock_guard<std::mutex> lock(peer_mutex_);
+
+    std::vector<Peer*> peers;
+    peers.reserve(peers_.size());
+
+    for (auto& [id, peer] : peers_)
+        peers.push_back(peer.get());
+
+    return peers;
+}
+
 void
 Node::
 listen()
 {
     while (running_)
     {
-        std::lock_guard<std::mutex> lock(peer_mutex_);
+        auto peers = get_peers();
 
-        for (auto& [id, peer] : peers_)
+        for (auto* peer : peers)
         {
             if (!peer->connected())
                 continue;
 
             auto raw = peer->receive();
-            if (raw.empty())
-                continue;
 
-            receive_message(raw);
+            if (!raw.empty())
+                receive_message(raw);
         }
     }
 }

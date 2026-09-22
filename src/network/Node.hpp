@@ -111,6 +111,13 @@ private:
     bool
     validate(const Block& blk);
 
+    /** Returns non-owning pointers to the node's current peers.
+     *
+     *  The returned pointers remain valid while peers are owned by the node.
+     */
+    std::vector<Peer*>
+    get_peers();
+
     /** Listener loop executed in the background thread.
      *
      *  Continuously polls each connected peer for incoming messages.
