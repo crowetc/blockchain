@@ -41,6 +41,7 @@ disconnect_impl()
 {
     if (connected_)
     {
+        shutdown(socket_fd_, SHUT_RDWR);
         close(socket_fd_);
         connected_ = false;
     }

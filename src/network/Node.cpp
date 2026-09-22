@@ -21,6 +21,12 @@ Node::
 stop()
 {
     running_ = false;
+
+    auto peers = get_peers();
+
+    for (auto* peer : peers)
+        peer->disconnect();
+
     if (listener_.joinable())
         listener_.join();
 }
