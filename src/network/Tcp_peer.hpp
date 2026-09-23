@@ -3,6 +3,7 @@
 
 #include "Peer.hpp"
 
+#include <atomic>
 #include <string>
 
 namespace bc
@@ -32,7 +33,7 @@ private:
     std::string host_;
     std::uint16_t port_;
     int socket_fd_;
-    bool connected_;
+    std::atomic<bool> connected_;
 
     /** Establish a TCP connection using POSIX socket APIs.
      *

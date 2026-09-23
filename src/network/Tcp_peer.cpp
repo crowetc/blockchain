@@ -31,7 +31,7 @@ connect_impl()
     if (::connect(socket_fd_, (sockaddr*)&addr, sizeof(addr)) < 0)
         return false;
 
-    connected_ = true;
+    connected_.store(true);
     return true;
 }
 
@@ -39,11 +39,10 @@ void
 Tcp_peer::
 disconnect_impl()
 {
-    if (connected_)
+    if (connected_.exchange(false))
     {
         shutdown(socket_fd_, SHUT_RDWR);
         close(socket_fd_);
-        connected_ = false;
     }
 }
 
@@ -51,7 +50,7 @@ bool
 Tcp_peer::
 send_impl(const std::string& data)
 {
-    if (!connected_)
+    if (!connected_.load())
         return false;
 
     ssize_t n = ::send(socket_fd_, data.c_str(), data.size(), 0);
@@ -62,7 +61,7 @@ std::string
 Tcp_peer::
 receive_impl()
 {
-    if (!connected_)
+    if (!connected_.load())
         return {};
 
     char buffer[4096];
