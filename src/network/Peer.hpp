@@ -9,12 +9,16 @@ namespace bc
 
 /** Peer
  *
- *  Protocol-agnostic communication interface used by Node.
+ *  Abstract interface for a network peer.
  *
- *  Responsibilities:
- *  - Establish and maintain a connection to a remote host.
- *  - Send and receive raw string data over the connection.
- *  - Provide a unique identifier for use in peer maps.
+ *  A peer must be connected before concurrent use begins. At most one
+ *  thread may call send() and at most one thread may call receive() at
+ *  a time. send() and receive() may execute concurrently.
+ *
+ *  disconnect() may be called concurrently with send() or receive()
+ *  and must interrupt any blocking peer operation.
+ *
+ *  connect() must not execute concurrently with any other operation.
  */
 class Peer
 {

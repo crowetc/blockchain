@@ -4,6 +4,7 @@
 #include "Peer.hpp"
 
 #include <atomic>
+#include <mutex>
 #include <string>
 
 namespace bc
@@ -13,9 +14,14 @@ namespace bc
  *
  *  Concrete Peer implementation using POSIX TCP sockets.
  *
- *  Implements the Peer interface using a blocking, stream-oriented
- *  TCP connection. All operations map directly to standard socket
- *  calls (connect, send, recv, close).
+ *  A peer must be connected before concurrent use begins. At most one
+ *  thread may call send() and at most one thread may call receive() at
+ *  a time. send() and receive() may execute concurrently.
+ *
+ *  disconnect() may be called concurrently with send() or receive()
+ *  and interrupts any blocking socket operation.
+ *
+ *  connect() must not execute concurrently with any other operation.
  */
 class Tcp_peer : public Peer
 {
@@ -34,6 +40,7 @@ private:
     std::uint16_t port_;
     int socket_fd_;
     std::atomic<bool> connected_;
+    std::mutex socket_mutex_;
 
     /** Establish a TCP connection using POSIX socket APIs.
      *
