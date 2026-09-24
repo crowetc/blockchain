@@ -76,11 +76,31 @@ send_impl(const std::string& data)
             return false;
     }
 
-    ssize_t n = ::send(fd, data.c_str(), data.size(), 0);
+    std::size_t total_sent = 0;
+
+    while (total_sent < data.size())
+    {
+        ssize_t n = ::send(
+            fd,
+            data.data() + total_sent,
+            data.size() - total_sent,
+            MSG_NOSIGNAL);
+
+        if (n > 0)
+        {
+            total_sent += static_cast<std::size_t>(n);
+            continue;
+        }
+
+        if (n < 0 && errno == EINTR)
+            continue;
+
+        ::close(fd);
+        return false;
+    }
 
     ::close(fd);
-
-    return n == static_cast<ssize_t>(data.size());
+    return true;
 }
 
 std::string
